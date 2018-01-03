@@ -1,0 +1,94 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php
+/**
+ * Shopping cart template
+ *
+ * @var $block \Cleargo\MultiCart\Block\SecondCart
+ */
+$quote=$block->getQuote();
+$item=$quote->getAllVisibleItems();
+$secondCartTotal=$block->getSecondCartTotals();
+if(empty($secondCartTotal)||empty($item)){
+    return;
+}
+?>
+<table>
+    <thead>
+    <tr>
+        <th>Item</th>
+        <th>Price</th>
+        <th>Qty</th>
+        <th>Subtotal</th>
+    </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <td colspan="5">
+                <?php foreach ($secondCartTotal['total_segments'] as $key=>$value):?>
+                    <?php if(empty($value['value'])){continue;}?>
+                    <?php echo $value['title'];?> : <?php echo $value['value'];?><br />
+                <?php endforeach;?>
+            </td>
+        </tr>
+    <tr>
+       <td>
+           Coupon Code:
+           <input type="text" name="second_coupon" id="second_coupon" /><br />
+           <a href="javascript:;" id="second_apply_button">Apply</a><br />
+           <a href="javascript:;" id="second_cancel_button">Cancel</a><br />
+           <a href="/multicart/checkout/index">Checkout with this cart</a>
+       </td>
+    </tr>
+    </tfoot>
+    <tbody>
+    <?php foreach ($item as $key=>$value):?>
+    <tr>
+        <td><?php echo $value->getName();?> <a href="<?php echo $block->getUrl('multicart/move/first',['item'=>$value->getItemId(),'quote'=>$block->getCheckOutSession()->getFirstQuoteId(),'qty'=>$value->getQty()]); ?>">Move this item to first quote</a></td>
+        <td><?php echo $value->getPrice();?></td>
+        <td><?php echo $value->getQty();?></td>
+        <td><?php echo $value->getRowTotal();?></td>
+    </tr>
+    <?php endforeach;?>
+    </tbody>
+</table>
+<script type="text/javascript">
+    require(['jquery'],function($){
+        $(document).ready(function(){
+            $('#second_apply_button').click(function(){
+               $.ajax({
+                   'url':'/multicart/coupon/apply',
+                   'type':'post',
+                   'data':{
+                       'code':$('#second_coupon').val()
+                   }
+               }).done(function(message){
+                   console.log(message);
+                   if(message==true) {
+                       window.location.reload();
+                   }else{
+                       alert(message.message)
+                   }
+               })
+            });
+            $('#second_cancel_button').click(function(){
+                $.ajax({
+                    'url':'/multicart/coupon/cancel',
+                    'type':'post'
+                }).done(function(message){
+                    console.log(message);
+                    if(message==true) {
+                        window.location.reload();
+                    }else{
+                        alert(message.message)
+                    }
+                })
+            });
+        });
+    });
+</script>
+

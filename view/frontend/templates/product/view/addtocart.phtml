@@ -1,0 +1,111 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Magento\Catalog\Block\Product\View */
+?>
+<?php $_product = $block->getProduct(); ?>
+<?php $buttonTitle = __('Add to Cart'); ?>
+<?php if ($_product->isSaleable()): ?>
+<div class="box-tocart">
+    <div class="fieldset">
+        <?php if ($block->shouldRenderQuantity()): ?>
+            <div class="field qty">
+                <label class="label" for="qty"><span><?= /* @escapeNotVerified */ __('Qty') ?></span></label>
+                <div class="control">
+                    <input type="number"
+                           name="qty"
+                           id="qty"
+                           value="<?= /* @escapeNotVerified */ $block->getProductDefaultQty() * 1 ?>"
+                           title="<?= /* @escapeNotVerified */ __('Qty') ?>"
+                           class="input-text qty"
+                           data-validate="<?= $block->escapeHtml(json_encode($block->getQuantityValidators())) ?>"
+                           />
+                </div>
+            </div>
+        <?php endif; ?>
+        <input type="hidden" name="secondcart" id="secondcart" value="0" /><br />
+        <input type="hidden" name="store" id="store" value="0" /><br />
+        <select name="buyType" id="buyType">
+            <option value=""><?php echo __('Please Select'); ?></option>
+            <option value="bnd"><?php echo __('Buy & Delivery'); ?></option>
+            <option value="cnr"><?php echo __('Click & Reserve'); ?></option>
+            <option value="cnc"><?php echo __('Click & Collect'); ?></option>
+        </select>
+        <hr />
+        <div id="secondCartDiv" class="secondCartDiv hide">
+            <div class="reserveStore">
+                <div class="leftrightWrapper">
+                    <h3 class="title"><?php echo __('Store:');?></h3>
+                    <button id="selectStore" class="selectStore" type="button"><?php echo __('Select Store'); ?></button>
+                </div>
+                <div id="storeResult" class="storeResult empty">
+                    <?php echo __("Haven't select store yet.");?>
+                </div>
+            </div>
+            <hr />
+        </div>
+        <div class="actions">
+            <button type="submit"
+                    title="<?= /* @escapeNotVerified */ $buttonTitle ?>"
+                    class="action primary tocart"
+                    id="product-addtocart-button">
+                <span><?= /* @escapeNotVerified */ $buttonTitle ?></span>
+            </button>
+            <?= $block->getChildHtml('', true) ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+<script type="text/javascript">
+    require(['jquery'],function($) {
+        $(document).ready(function () {
+            $('#buyType').change(function(){
+                $('#secondcart').val(0);
+                $('#secondCartDiv').addClass('hide')
+                var value=$(this).val();
+                switch(value){
+                    case 'cnr':
+                        temp=1;
+                        break;
+                    case 'cnc':
+                        temp=1;
+                        break;
+                    default:
+                        temp=0;
+                        break;
+                }
+                if(temp==1){
+                    $('#secondCartDiv').removeClass('hide');
+                }
+                $('#secondcart').val(temp);
+            });
+            $('#selectStore').click(function(){
+                $('#catalog-product-retailer-availability .showavailability a').click();
+            });
+        });
+    });
+</script>
+<?php if ($block->isRedirectToCartEnabled()) : ?>
+<script type="text/x-magento-init">
+    {
+        "#product_addtocart_form": {
+            "Magento_Catalog/product/view/validation": {
+                "radioCheckboxClosest": ".nested"
+            }
+        }
+    }
+</script>
+<?php else : ?>
+<script type="text/x-magento-init">
+    {
+        "#product_addtocart_form": {
+            "Magento_Catalog/js/validate-product": {}
+        }
+    }
+</script>
+<?php endif; ?>

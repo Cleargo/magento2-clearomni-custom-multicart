@@ -1,0 +1,24 @@
+{
+    "name": "cleargo/module-multicart",
+    "description": "Multi Cart",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Mage2Gen",
+            "email": "info@mage2gen.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "smile/elasticsuite": "^2.4.0",
+        "smile/module-elasticsuite-cms-search": "^2.1",
+        "smile/elasticsuite-for-retailer": "^1.3"},
+    "autoload": {
+        "psr-4": {
+            "Cleargo\\MultiCart\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}

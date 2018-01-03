@@ -1,0 +1,76 @@
+
+.secondCartDiv.hide{
+    display:none;
+}
+.secondCartDiv .reserveStore .title{
+    font-weight:bold;
+    font-size:18px;
+    color:black;
+}
+.secondCartDiv .reserveStore .leftrightWrapper{
+    display:flex;
+    justify-content:space-between;
+    flex-direction: row;
+}
+
+.secondCartDiv .reserveStore .leftrightWrapper .selectStore{
+    padding:5px 10px;
+    background:lightgrey;
+    color:grey;
+}
+.secondCartDiv .reserveStore .storeResult.empty{
+    color:lightgrey;
+    font-size:14px;
+}
+.product-store-availability{
+    display:none;
+}
+.itemPreview{
+    width:100%;
+}
+.itemPreview tbody td:nth-child(1){
+    width:100px;
+}
+.itemPreview .productName{
+    color:black;
+    font-weight:bold;
+    font-size:16px;
+}
+.itemPreview .brand{
+    color:lightgrey;
+    font-size:16px;
+}
+.itemPreview .additional-attr{
+    display:flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.itemPreview .additional-attr .option{
+    padding: 1px 2px;
+    min-width: 30px;
+    max-width: 90px;
+    height: 20px;
+    float: left;
+    margin: 0 10px 5px 0;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid rgb(218, 218, 218);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/*style for aigle*/
+.box-tocart .hide{
+    display:none;
+}
+.box-tocart .title{
+    display:block;
+    font-size:18px;
+    font-weight:bold;
+}
+.box-tocart .subTitle{
+    display:block;
+    color:darkgrey;
+    font-size:14px;
+}
+

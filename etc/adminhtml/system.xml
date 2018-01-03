@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<tab id="cleargo" sortOrder="999" translate="label">
+			<label>cleargo</label>
+		</tab>
+		<section id="multicart" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+			<label>multicart</label>
+			<tab>cleargo</tab>
+			<resource>Cleargo_ClearomniConnector::config_cleargo_clearomniconnector</resource>
+			<group id="multicart" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+				<label>multicart</label>
+				<field id="user" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text">
+					<label>user</label>
+					<comment/>
+				</field>
+				<field id="password" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text">
+					<label>password</label>
+					<comment/>
+				</field>
+				<field id="url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text">
+					<label>Magento Api Url</label>
+					<comment/>
+				</field>
+				<field id="store_field" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+					<label>Store Field</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<comment/>
+				</field>
+			</group>
+		</section>
+	</system>
+</config>

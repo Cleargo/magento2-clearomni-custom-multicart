@@ -68,8 +68,10 @@ class SalesOrderPlaceAfterObserver implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $order=$observer->getOrder();
-        if($this->helper->getCheckoutSession()->getFirstQuoteId()!=$order->getQuoteId()) {
-            $this->helper->changeMemberQuoteBackToActive($this->helper->getCheckoutSession()->getFirstQuoteId());
+        if($this->helper->getCheckoutSession()->getFirstQuoteId()>0) {
+            if ($this->helper->getCheckoutSession()->getFirstQuoteId() != $order->getQuoteId()) {
+                $this->helper->changeMemberQuoteBackToActive($this->helper->getCheckoutSession()->getFirstQuoteId());
+            }
         }
         $this->helper->getCheckoutSession()->unsCartToken();
         $this->helper->getCheckoutSession()->unsSecondQuoteId();

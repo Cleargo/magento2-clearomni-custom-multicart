@@ -43,6 +43,8 @@ class CartProductAddAfter implements \Magento\Framework\Event\ObserverInterface
 
     protected $quoteRepository;
 
+    protected $customerSession;
+
     public function __construct(
         \Magento\Framework\ObjectManagerInterface $objectManager,
         \Magento\Customer\Api\CustomerRepositoryInterface $customRepos,
@@ -53,7 +55,8 @@ class CartProductAddAfter implements \Magento\Framework\Event\ObserverInterface
         \Cleargo\MultiCart\Helper\Data $helper,
         \Magento\Framework\App\RequestInterface $request,
         \Magento\Catalog\Model\ProductRepository $productRepository,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
+        \Magento\Customer\Model\Session $customerSession
     )
     {
         $this->objectManager = $objectManager;
@@ -62,6 +65,7 @@ class CartProductAddAfter implements \Magento\Framework\Event\ObserverInterface
         $this->timezone = $timezone;
         $this->storeManager = $storeManager;
         $this->checkoutSession = $checkoutSession;
+        $this->customerSession = $customerSession;
         $this->helper=$helper;
         $this->request=$request;
         $this->productRepository=$productRepository;

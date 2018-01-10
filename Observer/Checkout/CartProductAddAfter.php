@@ -89,11 +89,7 @@ class CartProductAddAfter implements \Magento\Framework\Event\ObserverInterface
 //        exit;
         $product = $observer->getProduct();
         $quoteItem = $observer->getQuoteItem();
-        if($this->checkoutSession->getFirstQuoteId()){
-//            $this->helper->setFirstQuoteAsQuote();
-        }else {
-//            $this->checkoutSession->setFirstQuoteId($quoteItem->getQuoteId());
-        }
+        $this->checkoutSession->setFirstQuoteId($quoteItem->getQuoteId());
         $quote=$this->checkoutSession->getQuote();
         //Your observer code
         $this->checkoutSession->unsToken();

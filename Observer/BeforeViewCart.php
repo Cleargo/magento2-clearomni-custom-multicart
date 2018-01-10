@@ -35,6 +35,8 @@ class BeforeViewCart implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $checkoutSession=$this->helper->getCheckoutSession();
+//        var_dump(intval($checkoutSession->getFirstQuoteId()));
+//        exit;
         if(intval($checkoutSession->getFirstQuoteId())<=0){
             $checkoutSession->setFirstQuoteId($checkoutSession->getQuote()->getId());
         }

@@ -506,7 +506,16 @@ class Data extends AbstractHelper
         $cartToken=$this->checkoutSession->getCartToken();
         if($this->customerSession->isLoggedIn()){
             $customer=$this->customerRepos->getById($this->customerSession->getCustomer()->getId());
-            $result=$this->request('carts/mine/payment-information','POST',json_encode($payload),true,false,$customer->getCustomAttribute('access_token')->getValue());
+            try {
+                $this->_eventManager->dispatch('cleargo_multicart_member_placeorder_before', ['payload' => $payload]);
+                $result = $this->request('carts/mine/payment-information', 'POST', json_encode($payload), true, false, $customer->getCustomAttribute('access_token')->getValue());
+                $this->_eventManager->dispatch('cleargo_multicart_member_placeorder_after');
+            }catch (\Exception $e){
+                return [
+                    'result'=>'false',
+                    'message'=>$e->getMessage()
+                ];
+            }
             //need to do this here because observer cant get current session
             $this->changeMemberQuoteBackToActive($this->customerSession->getFirstQuoteId());
             $this->getCheckoutSession()->unsCartToken();
@@ -531,4 +540,13 @@ class Data extends AbstractHelper
         $token=$this->tokenFactory->create()->createCustomerToken($customer->getId());
         return $token;
     }
+
+    /**
+     * @return Session|\Magento\Customer\Model\Session
+     */
+    public function getCustomerSession()
+    {
+        return $this->customerSession;
+    }
+
 }

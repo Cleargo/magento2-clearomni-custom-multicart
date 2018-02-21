@@ -102,7 +102,6 @@ class CartProductAddAfter implements \Magento\Framework\Event\ObserverInterface
             } else {
                 $result = $this->helper->addProductToCart($product, $quoteItem->getQtyToAdd());
             }
-            
             if($quoteItem->getQty()-$quoteItem->getQtyToAdd()==0) {
                 $quote->deleteItem($quoteItem);
             }else{

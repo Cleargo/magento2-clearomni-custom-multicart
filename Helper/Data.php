@@ -475,6 +475,7 @@ class Data extends AbstractHelper
         }
          */
         $this->authentication();
+//        $this->createCart();
         $cartToken=$this->checkoutSession->getCartToken();
         if(isset($cartToken)) {
             $result = $this->request('guest-carts/'.$cartToken.'/shipping-information', 'POST',json_encode($address),true,true);
@@ -504,7 +505,10 @@ class Data extends AbstractHelper
          */
         $this->authentication();
         $cartToken=$this->checkoutSession->getCartToken();
-        if($this->customerSession->isLoggedIn()){
+        $context = $this->_objectManager->get('Magento\Framework\App\Http\Context');
+        $isLoggedIn = $context->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
+        $cacheLogin=$isLoggedIn;
+        if($this->customerSession->isLoggedIn()||$cacheLogin){
             $customer=$this->customerRepos->getById($this->customerSession->getCustomer()->getId());
             try {
                 $this->_eventManager->dispatch('cleargo_multicart_member_placeorder_before', ['payload' => $payload]);
@@ -521,19 +525,20 @@ class Data extends AbstractHelper
             $this->getCheckoutSession()->unsCartToken();
             $this->getCheckoutSession()->unsSecondQuoteId();
             $this->customerSession->unsFirstQuoteId();
+
             return $result;
         }else {
             if (isset($cartToken)) {
                 $result = $this->request('guest-carts/' . $cartToken . '/order', 'PUT', json_encode($payload), true, true);
                 //need to do this here because observer cant get current session
-                $this->changeMemberQuoteBackToActive($this->helper->getCheckoutSession()->getFirstQuoteId());
+                $this->changeMemberQuoteBackToActive($this->getCheckoutSession()->getFirstQuoteId());
                 $this->getCheckoutSession()->unsCartToken();
                 $this->getCheckoutSession()->unsSecondQuoteId();
                 return $result;
             }
         }
 
-        return [];
+        return false;
     }
 
     public function generateCustomerToken($customer){

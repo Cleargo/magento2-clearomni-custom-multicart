@@ -43,6 +43,7 @@ class Data extends AbstractHelper
     protected $customerSession;
     protected $tokenFactory;
     protected $customerRepos;
+    protected $currentCustomer;
     /**
      * @param Magento\Framework\App\Helper\Context $context
      * @param Magento\Framework\ObjectManagerInterface $objectManager
@@ -63,7 +64,8 @@ class Data extends AbstractHelper
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Integration\Model\Oauth\TokenFactory $tokenFactory,
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepositoryInterface
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepositoryInterface,
+        \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer
     )
     {
         $this->_objectManager = $objectManager;
@@ -81,6 +83,7 @@ class Data extends AbstractHelper
         $this->customerSession=$customerSession;
         $this->tokenFactory=$tokenFactory;
         $this->customerRepos=$customerRepositoryInterface;
+        $this->currentCustomer=$currentCustomer;
         parent::__construct($context);
     }
 
@@ -113,6 +116,24 @@ class Data extends AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+
+    /**
+     * @return \Magento\Customer\Helper\Session\CurrentCustomer
+     */
+    public function getCurrentCustomer()
+    {
+        return $this->currentCustomer;
+    }
+
+    /**
+     * @return \Magento\Customer\Api\CustomerRepositoryInterface
+     */
+    public function getCustomerRepos()
+    {
+        return $this->customerRepos;
+    }
+
+
     public function authentication(){
         $token=$this->checkoutSession->getToken();
         if(!isset($token)) {

@@ -107,7 +107,7 @@ class CartProductAddAfter implements \Magento\Framework\Event\ObserverInterface
             }else{
                 $quoteItem->setQty($quoteItem->getQty()-$quoteItem->getQtyToAdd());
             }
-            if($this->helper->getStoreField()) {
+            if($this->helper->getStoreField()||true) {
                 $storeCode=$this->request->getParam('store');
                 $result = json_decode($result,true);
                 if (isset($result['item_id'])&&!empty($storeCode)){

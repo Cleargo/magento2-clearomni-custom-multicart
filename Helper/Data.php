@@ -531,6 +531,10 @@ class Data extends AbstractHelper
         $cacheLogin=$isLoggedIn;
         if($this->customerSession->isLoggedIn()||$cacheLogin){
             $customer=$this->customerRepos->getById($this->customerSession->getCustomer()->getId());
+            if($cacheLogin){
+                $repos=$this->getCustomerRepos();
+                $customer=$this->_objectManager->create('Magento\Customer\Model\Customer')->load($context->getValue(\Cleargo\AigleClearomniConnector\Model\Customer\Context::CONTEXT_CUSTOMER_ID));
+            }
             try {
                 $this->_eventManager->dispatch('cleargo_multicart_member_placeorder_before', ['payload' => $payload]);
                 $result = $this->request('carts/mine/payment-information', 'POST', json_encode($payload), true, false, $customer->getCustomAttribute('access_token')->getValue());

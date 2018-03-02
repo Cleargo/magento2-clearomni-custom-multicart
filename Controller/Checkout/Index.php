@@ -47,7 +47,13 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        if($this->customerSession->isLoggedIn()){
+        $context = $this->_objectManager->get('Magento\Framework\App\Http\Context');
+        $customer=$this->customerSession->getCustomer();
+        if(!$customer->getFirstName()){
+            $repos=$this->helper->getCustomerRepos();
+            $customer=$this->_objectManager->create('Magento\Customer\Model\Customer')->load($context->getValue(\Cleargo\AigleClearomniConnector\Model\Customer\Context::CONTEXT_CUSTOMER_ID));
+        }
+        if($customer->getId()){
             $this->helper->turnGuestQuoteToMemberQuote($this->checkoutSession->getSecondQuoteId(),$this->checkoutSession->getQuote()->getId());
             //deactive default quote
             $objectManager=\Magento\Framework\App\ObjectManager::getInstance();

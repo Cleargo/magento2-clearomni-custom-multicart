@@ -200,7 +200,7 @@ class Data extends AbstractHelper
         return [];
     }
 
-    public function addProductToCart($product,$qty,$parentProduct=false,$superAttribute=[]){
+    public function addProductToCart($product,$qty,$parentProduct=false,$superAttribute=[],$productOption=[]){
         $this->authentication();
         $cartId=$this->checkoutSession->getSecondQuoteId();
         $cartToken=$this->checkoutSession->getCartToken();
@@ -247,6 +247,12 @@ class Data extends AbstractHelper
                     'option_value'=>(string)$value
                 ];
             }
+        }
+        if(!empty($productOption)){
+            if(!isset($order['cartItem']['product_option'])){
+                $order['cartItem']['product_option']=[];
+            }
+            $order['cartItem']['product_option']=array_merge($order['cartItem']['product_option'],$productOption);
         }
         $result=$this->request('guest-carts/' . $cartToken . '/items',
             'POST',

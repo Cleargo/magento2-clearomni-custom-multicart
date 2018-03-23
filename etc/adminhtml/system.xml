@@ -27,6 +27,11 @@
 					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
 					<comment/>
 				</field>
+				<field id="must_member_api" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+					<label>Use member api checkout</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<comment/>
+				</field>
 			</group>
 		</section>
 	</system>

@@ -14,6 +14,7 @@ class Data extends AbstractHelper
     const XML_MULTICART_PASSWORD_PATH='multicart/multicart/password';
     const XML_MULTICART_URL_PATH='multicart/multicart/url';
     const XML_MULTICART_STORE_FIELD='multicart/multicart/store_field';
+    const XML_MULTICART_MUST_MEMBER='multicart/multicart/must_member_api';
 
     protected $_objectManager;
     protected $_filesystem;
@@ -113,6 +114,13 @@ class Data extends AbstractHelper
     {
         return $this->scopeConfig->getValue(
             self::XML_MULTICART_STORE_FIELD,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    public function getMemberApi()
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_MULTICART_MUST_MEMBER,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
@@ -332,6 +340,9 @@ class Data extends AbstractHelper
     public function changeMemberQuoteBackToActive($memberQuoteId){
 //        echo json_encode([$memberQuoteId,$this->customerSession->getFirstQuoteId(),'changeMemberQuoteBackToActive']);
 //        exit;
+        if(intval($memberQuoteId)<=0){
+            return;
+        }
         $memberQuote=$this->quoteRepository->get($memberQuoteId);
         //make first quote back to active
         $memberQuote->setIsActive(true);
@@ -537,8 +548,12 @@ class Data extends AbstractHelper
             }
             try {
                 $this->_eventManager->dispatch('cleargo_multicart_member_placeorder_before', ['payload' => $payload]);
-                $result = $this->request('carts/mine/payment-information', 'POST', json_encode($payload), true, false, $customer->getCustomAttribute('access_token')->getValue());
-                $this->_eventManager->dispatch('cleargo_multicart_member_placeorder_after');
+                if($this->getMemberApi()){
+                    $result = $this->request('carts/mine/payment-information', 'POST', json_encode($payload), true, false, $customer->getCustomAttribute('access_token')->getValue());
+                }else {
+                    $result = $this->request('guest-carts/' . $cartToken . '/order', 'PUT', json_encode($payload), true, true);
+                }
+                $this->_eventManager->dispatch('cleargo_multicart_member_placeorder_after',['result'=>$result]);
             }catch (\Exception $e){
                 return [
                     'result'=>'false',
@@ -546,7 +561,9 @@ class Data extends AbstractHelper
                 ];
             }
             //need to do this here because observer cant get current session
-            $this->changeMemberQuoteBackToActive($this->customerSession->getFirstQuoteId());
+            if($this->getMemberApi()) {
+                $this->changeMemberQuoteBackToActive($this->customerSession->getFirstQuoteId());
+            }
             $this->getCheckoutSession()->unsCartToken();
             $this->getCheckoutSession()->unsSecondQuoteId();
             $this->customerSession->unsFirstQuoteId();

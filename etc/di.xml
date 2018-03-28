@@ -3,4 +3,7 @@
     <type name="Magento\Quote\Model\Quote\Item\ToOrderItem">
         <plugin name="CleargoMultiCart_to_order_item" type="Cleargo\MultiCart\Plugin\Magento\Quote\MultiCartToOrderItem"/>
     </type>
+    <type name="Magento\Framework\App\Action\AbstractAction">
+        <plugin name="dispatchController-context-plugin" type="Cleargo\MultiCart\Plugin\App\Action\Context" sortOrder="15"/>
+    </type>
 </config>

@@ -330,6 +330,7 @@ class Data extends AbstractHelper
         $guestQuote=$this->quoteRepository->get($guestQuoteId);
         $memberQuote=$this->quoteRepository->get($memberQuoteId);
         $this->customerSession->setFirstQuoteId($memberQuoteId);
+        $this->checkoutSession->setFirstQuoteId($memberQuoteId);
         $query=$this->connection->prepare('update quote set is_active=0 where customer_id=?');
         $query->bindValue(1,$memberQuote->getCustomer()->getId());
         $query->execute();
@@ -547,10 +548,12 @@ class Data extends AbstractHelper
         $isLoggedIn = $context->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
         $cacheLogin=$isLoggedIn;
         if($this->customerSession->isLoggedIn()||$cacheLogin){
-            $customer=$this->customerRepos->getById($this->customerSession->getCustomer()->getId());
+            $customer=$this->customerRepos->getById($this->customerSession->getCustomerId());
             if($cacheLogin){
                 $repos=$this->getCustomerRepos();
-                $customer=$this->_objectManager->create('Magento\Customer\Model\Customer')->load($context->getValue(\Cleargo\PuyiClearomniConnector\Model\Customer\Context::CONTEXT_CUSTOMER_ID));
+                if(!$customer->getFirstname()) {
+                    $customer = $this->_objectManager->create('Magento\Customer\Model\Customer')->load($context->getValue(\Cleargo\MultiCart\Model\Customer\Context::CONTEXT_CUSTOMER_ID));
+                }
             }
             try {
                 $this->_eventManager->dispatch('cleargo_multicart_member_placeorder_before', ['payload' => $payload]);
@@ -568,7 +571,7 @@ class Data extends AbstractHelper
             }
             //need to do this here because observer cant get current session
             if($this->getMemberApi()) {
-                $this->changeMemberQuoteBackToActive($this->customerSession->getFirstQuoteId());
+                $this->changeMemberQuoteBackToActive($this->checkoutSession->getFirstQuoteId());
             }
             $this->getCheckoutSession()->unsCartToken();
             $this->getCheckoutSession()->unsSecondQuoteId();

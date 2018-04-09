@@ -49,7 +49,7 @@ class Index extends \Magento\Framework\App\Action\Action
     {
         $context = $this->_objectManager->get('Magento\Framework\App\Http\Context');
         $customer=$this->customerSession->getCustomer();
-        if(!$customer->getFirstName()){
+        if(!$customer->getFirstname()){
             $repos=$this->helper->getCustomerRepos();
             $customer=$this->_objectManager->create('Magento\Customer\Model\Customer')->load($context->getValue(\Cleargo\AigleClearomniConnector\Model\Customer\Context::CONTEXT_CUSTOMER_ID));
         }

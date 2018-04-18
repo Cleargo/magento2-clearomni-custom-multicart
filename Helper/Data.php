@@ -200,7 +200,7 @@ class Data extends AbstractHelper
         return [];
     }
 
-    public function addProductToCart($product,$qty,$parentProduct=false,$superAttribute=[],$productOption=[],$cartToken=false){
+    public function addProductToCart($product,$qty,$parentProduct=false,$superAttribute=[],$productOption=[],$cartToken=false,$mustGuest=true){
         $this->authentication();
         $cartId=$this->checkoutSession->getSecondQuoteId();
         if($cartToken==false) {
@@ -261,7 +261,7 @@ class Data extends AbstractHelper
                 ];
             }
         }
-        if($this->getCustomerSession()->isLoggedIn()){
+        if($this->getCustomerSession()->isLoggedIn()&&$mustGuest==false){
             $order['cartItem']['quote_id']=$this->getCheckoutSession()->getQuote()->getId();
             $customer=$this->getCustomerRepos()->getById($this->getCustomerSession()->getCustomer()->getId());
 //            echo json_encode($order);

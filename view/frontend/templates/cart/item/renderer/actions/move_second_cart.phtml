@@ -5,6 +5,12 @@
 $objectManager=\Magento\Framework\App\ObjectManager::getInstance();
 $item=$block->getItem();
 $helper=$objectManager->get('Cleargo\MultiCart\Helper\Data');
+$firstQuoteId=$helper->getFirstQuoteId();
+//$secondQuoteId = $helper->getCheckoutSession()->getSecondQuoteId();
+//if(!isset($secondQuoteId)){
+//    $helper->createCart();
+//    $helper->getCart();
+//}
 ?>
 
 <a href="<?php echo $block->getUrl('multicart/move/second',['item'=>$item->getId(),'quote'=>$helper->getCheckOutSession()->getSecondQuoteId(),'qty'=>$item->getQty()]); ?>">Move this item to second quote</a>

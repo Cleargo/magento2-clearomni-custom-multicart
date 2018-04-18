@@ -200,10 +200,12 @@ class Data extends AbstractHelper
         return [];
     }
 
-    public function addProductToCart($product,$qty,$parentProduct=false,$superAttribute=[],$productOption=[]){
+    public function addProductToCart($product,$qty,$parentProduct=false,$superAttribute=[],$productOption=[],$cartToken=false){
         $this->authentication();
         $cartId=$this->checkoutSession->getSecondQuoteId();
-        $cartToken=$this->checkoutSession->getCartToken();
+        if($cartToken==false) {
+            $cartToken = $this->checkoutSession->getCartToken();
+        }
 
         /*
          * {
@@ -252,13 +254,32 @@ class Data extends AbstractHelper
             if(!isset($order['cartItem']['product_option'])){
                 $order['cartItem']['product_option']=[];
             }
-            $order['cartItem']['product_option']=array_merge($order['cartItem']['product_option'],$productOption);
+            foreach ($productOption as $key=>$value){
+                $order['cartItem']['product_option']['extension_attributes']['custom_options'][]=[
+                    'option_id'=>(string)$key,
+                    'option_value'=>(string)$value
+                ];
+            }
         }
-        $result=$this->request('guest-carts/' . $cartToken . '/items',
-            'POST',
-            json_encode($order),
-            false
-        );
+        if($this->getCustomerSession()->isLoggedIn()){
+            $order['cartItem']['quote_id']=$this->getCheckoutSession()->getQuote()->getId();
+            $customer=$this->getCustomerRepos()->getById($this->getCustomerSession()->getCustomer()->getId());
+//            echo json_encode($order);
+//            exit;
+            $result = $this->request('carts/mine/items',
+                'POST',
+                json_encode($order),
+                false,
+                false,
+                $customer->getCustomAttribute('access_token')->getValue()
+            );
+        }else {
+            $result = $this->request('guest-carts/' . $cartToken . '/items',
+                'POST',
+                json_encode($order),
+                false
+            );
+        }
         return $result;
     }
     public function updateProduct($itemId,$qty){
@@ -595,6 +616,18 @@ class Data extends AbstractHelper
     public function generateCustomerToken($customer){
         $token=$this->tokenFactory->create()->createCustomerToken($customer->getId());
         return $token;
+    }
+    
+    public function getFirstQuoteId(){
+        $firstQuoteId=$this->getCheckoutSession()->getFirstQuoteId();
+        $secondQuoteId=$this->getCheckoutSession()->getSecondQuoteId();
+        if($firstQuoteId!=$this->getCheckoutSession()->getQuoteId()){
+            $secondQuoteId=$firstQuoteId;
+            $firstQuoteId=$this->getCheckoutSession()->getQuoteId();
+            $this->getCheckoutSession()->setFirstQuoteId($firstQuoteId);
+            $this->getCheckoutSession()->setSecondQuoteId($secondQuoteId);
+        }
+        return $firstQuoteId;
     }
 
     /**

@@ -261,7 +261,7 @@ class Data extends AbstractHelper
                 ];
             }
         }
-        if($this->getCustomerSession()->isLoggedIn()&&$mustGuest==false){
+        if($this->getCustomerSession()->isLoggedIn()&&$mustGuest==true){
             $order['cartItem']['quote_id']=$this->getCheckoutSession()->getQuote()->getId();
             $customer=$this->getCustomerRepos()->getById($this->getCustomerSession()->getCustomer()->getId());
 //            echo json_encode($order);

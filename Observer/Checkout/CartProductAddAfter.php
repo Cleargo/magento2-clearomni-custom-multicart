@@ -98,9 +98,9 @@ class CartProductAddAfter implements \Magento\Framework\Event\ObserverInterface
         if(intval($this->request->getParam('secondcart'))==1) {
             if (in_array($quoteItem->getProductType(), ['configurable', 'bundle'])) {
                 $parentProduct = $quoteItem->getProduct();
-                $result = $this->helper->addProductToCart($product, $quoteItem->getQtyToAdd(), $parentProduct, $this->request->getParam('super_attribute'));
+                $result = $this->helper->addProductToCart($product, $quoteItem->getQtyToAdd(), $parentProduct, $this->request->getParam('super_attribute'),[],false,false);
             } else {
-                $result = $this->helper->addProductToCart($product, $quoteItem->getQtyToAdd());
+                $result = $this->helper->addProductToCart($product, $quoteItem->getQtyToAdd(), false, [],[],false,false);
             }
             if($quoteItem->getQty()-$quoteItem->getQtyToAdd()==0) {
                 $quote->deleteItem($quoteItem);

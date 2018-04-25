@@ -282,11 +282,10 @@ class Data extends AbstractHelper
         }
         return $result;
     }
-    public function updateProduct($itemId,$qty){
+    public function updateProduct($itemId,$qty,$parentProduct=false,$superAttribute=[],$productOption=[],$cartToken=false,$mustGuest=true){
         $this->authentication();
         $cartId=$this->checkoutSession->getSecondQuoteId();
         $cartToken=$this->checkoutSession->getCartToken();
-
         $order = array(
             'cartItem' => array(
                 'quote_id' => (string)$cartToken."",
@@ -294,11 +293,50 @@ class Data extends AbstractHelper
                 'qty' => $qty
             )
         );
-        $result=$this->request('guest-carts/' . $cartToken . '/items/'.$itemId,
-            'PUT',
-            json_encode($order),
-            false
-        );
+        if($parentProduct){
+            $data=$parentProduct->getData();
+            $order['cartItem']['sku']=$data['sku'];
+            foreach ($superAttribute as $key=>$value){
+                $order['cartItem']['product_option']['extension_attributes']['configurable_item_options'][]=[
+                    'option_id'=>(string)$key,
+                    'option_value'=>(string)$value
+                ];
+            }
+        }
+        if(!empty($productOption)){
+            if(!isset($order['cartItem']['product_option'])){
+                $order['cartItem']['product_option']=[];
+            }
+            foreach ($productOption as $key=>$value){
+                $order['cartItem']['product_option']['extension_attributes']['custom_options'][]=[
+                    'option_id'=>(string)$key,
+                    'option_value'=>(string)$value
+                ];
+            }
+        }
+        if($this->getCustomerSession()->isLoggedIn()&&$mustGuest==true){
+            $order['cartItem']['quote_id']=$this->getCheckoutSession()->getQuote()->getId();
+            $customer=$this->getCustomerRepos()->getById($this->getCustomerSession()->getCustomer()->getId());
+//            var_dump('carts/mine/items/'.$itemId,$customer->getCustomAttribute('access_token')->getValue());
+            $result = $this->request('carts/mine/items/'.$itemId,
+                'PUT',
+                json_encode($order),
+                false,
+                false,
+                $customer->getCustomAttribute('access_token')->getValue()
+            );
+        }else {
+            $result = $this->request('guest-carts/' . $cartToken . '/items/'.$itemId,
+                'PUT',
+                json_encode($order),
+                false
+            );
+        }
+//        $result=$this->request('guest-carts/' . $cartToken . '/items/'.$itemId,
+//            'PUT',
+//            json_encode($order),
+//            false
+//        );
         return $result;
     }
     public function request($endpoint, $method = 'GET', $body = FALSE,$json=true,$noToken=false,$customToken='') {

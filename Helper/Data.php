@@ -285,12 +285,14 @@ class Data extends AbstractHelper
     public function updateProduct($itemId,$qty,$parentProduct=false,$superAttribute=[],$productOption=[],$cartToken=false,$mustGuest=true){
         $this->authentication();
         $cartId=$this->checkoutSession->getSecondQuoteId();
-        $cartToken=$this->checkoutSession->getCartToken();
+        if($cartToken==false) {
+            $cartToken = $this->checkoutSession->getCartToken();
+        }
         $order = array(
             'cartItem' => array(
                 'quote_id' => (string)$cartToken."",
                 'item_id' => (string)$itemId."",
-                'qty' => $qty
+                'qty' => $qty,
             )
         );
         if($parentProduct){
@@ -314,6 +316,7 @@ class Data extends AbstractHelper
                 ];
             }
         }
+        ///{cartId}/items/{itemId}
         if($this->getCustomerSession()->isLoggedIn()&&$mustGuest==true){
             $order['cartItem']['quote_id']=$this->getCheckoutSession()->getQuote()->getId();
             $customer=$this->getCustomerRepos()->getById($this->getCustomerSession()->getCustomer()->getId());
@@ -326,7 +329,7 @@ class Data extends AbstractHelper
                 $customer->getCustomAttribute('access_token')->getValue()
             );
         }else {
-            $result = $this->request('guest-carts/' . $cartToken . '/items/'.$itemId,
+            $result = $this->request('carts/' . $cartToken . '/items/'.$itemId,
                 'PUT',
                 json_encode($order),
                 false

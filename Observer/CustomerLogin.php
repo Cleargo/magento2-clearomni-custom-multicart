@@ -23,5 +23,7 @@ class CustomerLogin implements ObserverInterface
         $dataModel=$customer->getDataModel();
         $dataModel->setCustomAttribute('access_token', $token->getToken());
         $this->customerRepos->save($dataModel);
+//        var_dump('aweawcc');
+//        exit;
     }
 }

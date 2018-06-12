@@ -16,6 +16,6 @@
 		<observer name="multicart_sales_order_place_after_observer" instance="Cleargo\MultiCart\Observer\SalesOrderPlaceAfterObserver" />
 	</event>
 	<event name="customer_login">
-		<observer name="customer_login_observer" instance="Cleargo\MultiCart\Observer\CustomerLogin" />
+		<observer name="customer_login_multi_observer" instance="Cleargo\MultiCart\Observer\CustomerLogin" />
 	</event>
 </config>

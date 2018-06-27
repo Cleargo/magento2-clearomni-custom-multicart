@@ -51,7 +51,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $customer=$this->customerSession->getCustomer();
         if(!$customer->getFirstname()){
             $repos=$this->helper->getCustomerRepos();
-            $customer=$this->_objectManager->create('Magento\Customer\Model\Customer')->load($context->getValue(\Cleargo\AigleClearomniConnector\Model\Customer\Context::CONTEXT_CUSTOMER_ID));
+            $customer=$this->_objectManager->create('Magento\Customer\Model\Customer')->load($context->getValue(\Cleargo\MultiCart\Model\Customer\Context::CONTEXT_CUSTOMER_ID));
         }
         if($customer->getId()){
             $this->helper->turnGuestQuoteToMemberQuote($this->checkoutSession->getSecondQuoteId(),$this->checkoutSession->getQuote()->getId());

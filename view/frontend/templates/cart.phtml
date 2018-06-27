@@ -17,6 +17,9 @@ if(empty($secondCartTotal)||empty($item)){
     return;
 }
 ?>
+<script type=text/javascript>
+window.secondCart=<?php echo json_encode($secondCartTotal); ?>;
+</script>
 <table>
     <thead>
     <tr>

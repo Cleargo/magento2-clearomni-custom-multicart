@@ -158,6 +158,15 @@ class Data extends AbstractHelper
             $this->checkoutSession->setCartToken($result);
         }
     }
+    public function createMemberCart(){
+        $this->authentication();
+//        $this->checkoutSession->unsCartToken();
+//        $cartToken=$this->checkoutSession->getCartToken();
+        $customer=$this->getCustomerRepos()->getById($this->getCustomerSession()->getCustomer()->getId());
+        $result = $this->request('carts/mine/', 'POST',json_encode([]),true,false,$customer->getCustomAttribute('access_token')->getValue());
+        return $result;
+//            $this->checkoutSession->setCartToken($result);
+    }
     public function getCheckoutSession(){
         return $this->checkoutSession;
     }
@@ -201,12 +210,12 @@ class Data extends AbstractHelper
     }
 
     public function addProductToCart($product,$qty,$parentProduct=false,$superAttribute=[],$productOption=[],$cartToken=false,$mustGuest=true){
+        $this->createCart();
         $this->authentication();
         $cartId=$this->checkoutSession->getSecondQuoteId();
         if($cartToken==false) {
             $cartToken = $this->checkoutSession->getCartToken();
         }
-
         /*
          * {
   "cartItem": {
@@ -232,7 +241,6 @@ class Data extends AbstractHelper
 }
         {"store_id":1,"quote_id":"7","product":{},"product_id":"1596","product_type":"configurable","sku":"WS05-XS-Orange","name":"Desiree Fitness Tee","weight":"1.0000","tax_class_id":"2","base_cost":null,"is_qty_decimal":false,"qty_to_add":3,"qty":3,"qty_options":{"1582":{}},"has_children":true}
          */
-        
         $order = array(
             'cartItem' => array(
                 'quote_id' => (string)$cartToken."",
@@ -262,7 +270,12 @@ class Data extends AbstractHelper
             }
         }
         if($this->getCustomerSession()->isLoggedIn()&&$mustGuest==true){
-            $order['cartItem']['quote_id']=$this->getCheckoutSession()->getQuote()->getId();
+            $quoteId=$this->getCheckoutSession()->getQuote()->getId();
+            if($this->getCheckoutSession()->getQuote()->getId()==null){
+                $result=$this->createMemberCart();
+                $quoteId=$result;
+            }
+            $order['cartItem']['quote_id']=$quoteId;
             $customer=$this->getCustomerRepos()->getById($this->getCustomerSession()->getCustomer()->getId());
 //            echo json_encode($order);
 //            exit;
@@ -329,7 +342,7 @@ class Data extends AbstractHelper
                 $customer->getCustomAttribute('access_token')->getValue()
             );
         }else {
-            $result = $this->request('carts/' . $cartToken . '/items/'.$itemId,
+            $result = $this->request('guest-carts/' . $cartToken . '/items/'.$itemId,
                 'PUT',
                 json_encode($order),
                 false
@@ -590,13 +603,13 @@ class Data extends AbstractHelper
         $cartToken=$this->checkoutSession->getCartToken();
         $customer=$this->customerRepos->getById($this->customerSession->getCustomer()->getId());
         if(isset($cartToken)) {
-            $result = $this->request('carts/mine/shipping-information', 'POST',json_encode($address),true,false,$customer->getCustomAttribute('access_token')->getValue());
+            $result = $this->request('carts/mine/shipping-information', 'POST',json_encode($address),false,false,$customer->getCustomAttribute('access_token')->getValue());
             return $result;
         }
 
         return [];
     }
-    public function placeOrder($payload){
+    public function placeOrder($payload,$useMemberApi=false){
         /**
          {
             "paymentMethod": {
@@ -619,7 +632,7 @@ class Data extends AbstractHelper
             }
             try {
                 $this->_eventManager->dispatch('cleargo_multicart_member_placeorder_before', ['payload' => $payload]);
-                if($this->getMemberApi()){
+                if($this->getMemberApi()||$useMemberApi){
                     $result = $this->request('carts/mine/payment-information', 'POST', json_encode($payload), true, false, $customer->getCustomAttribute('access_token')->getValue());
                 }else {
                     $result = $this->request('guest-carts/' . $cartToken . '/order', 'PUT', json_encode($payload), true, true);
